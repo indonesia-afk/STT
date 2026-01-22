@@ -4,7 +4,7 @@ import os
 import subprocess
 import math
 import tempfile
-from shutil import which
+from shutil import which # Wajib ada untuk deteksi di Cloud
 
 # ==========================================
 # 1. SETUP & CONFIG
@@ -16,15 +16,15 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (TAMPILAN BERSIH & CENTERED) ---
+# --- CUSTOM CSS (MODERN, CLEAN, DARK MODE FIX) ---
 st.markdown("""
 <style>
-    /* Background Bersih */
+    /* 1. Paksa Background Putih Bersih */
     .stApp {
         background-color: #FFFFFF; 
     }
     
-    /* Judul Header */
+    /* 2. Judul Header */
     .main-header {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         font-weight: 800;
@@ -45,23 +45,28 @@ st.markdown("""
         font-weight: 400;
     }
 
-    /* --- UPDATE: LABEL RATA TENGAH --- */
-    /* Target Label File Uploader & Selectbox agar Center */
+    /* 3. FIX LABEL AGAR TERLIHAT & CENTER */
     .stFileUploader label, div[data-testid="stSelectbox"] label {
         width: 100% !important;
         text-align: center !important;
         display: block !important;
-        color: #111 !important; /* Warna Hitam Jelas */
+        color: #111 !important; /* Hitam Pekat */
         font-size: 1rem !important;
         font-weight: 600 !important;
         margin-bottom: 8px !important;
     }
+
+    /* 4. FIX TEXT CAPTION (SEDANG MEMPROSES...) */
+    /* Memaksa caption menjadi abu-abu gelap agar tidak putih-di-atas-putih saat mode gelap */
+    .stCaption, div[data-testid="stCaptionContainer"], small, p {
+        color: #444444 !important; 
+    }
     
-    /* Tombol Utama */
+    /* 5. Tombol Utama */
     div.stButton > button {
         width: 100%;
-        background: #000000; /* Hitam Elegan */
-        color: white;
+        background: #000000;
+        color: white !important;
         border: none;
         padding: 14px 20px;
         font-size: 16px;
@@ -75,41 +80,53 @@ st.markdown("""
         background: #333333;
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        color: white;
+        color: white !important;
     }
     
-    /* Footer Link */
+    /* 6. Footer Link */
     .footer-link {
         text-decoration: none; 
         font-weight: 700; 
-        color: #e74c3c;
+        color: #e74c3c !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. LOGIKA FFMPEG (HYBRID)
+# 2. LOGIKA FFMPEG (HYBRID: CLOUD & LOCAL)
 # ==========================================
 project_folder = os.getcwd()
 local_ffmpeg = os.path.join(project_folder, "ffmpeg.exe")
 local_ffprobe = os.path.join(project_folder, "ffprobe.exe")
 
+# Logika Deteksi: Cek Local Dulu -> Kalau Gak Ada, Cek Sistem (Cloud)
 if os.path.exists(local_ffmpeg) and os.path.exists(local_ffprobe):
+    # Mode Local (Windows Laptop Mas Tommy)
     ffmpeg_cmd = local_ffmpeg
     ffprobe_cmd = local_ffprobe
     os.environ["PATH"] += os.pathsep + project_folder
+    # st.sidebar.success("🟢 Mode: Local Windows") 
 else:
+    # Mode Cloud (Server Linux Streamlit)
     if which("ffmpeg") and which("ffprobe"):
         ffmpeg_cmd = "ffmpeg"
         ffprobe_cmd = "ffprobe"
+        # st.sidebar.success("☁️ Mode: Cloud Server")
     else:
         st.error("❌ Critical Error: FFmpeg tools not found.")
         st.stop()
 
 def get_duration(file_path):
-    cmd = [ffprobe_cmd, "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", file_path]
+    cmd = [
+        ffprobe_cmd, 
+        "-v", "error", 
+        "-show_entries", "format=duration", 
+        "-of", "default=noprint_wrappers=1:nokey=1", 
+        file_path
+    ]
     try:
-        return float(subprocess.check_output(cmd, stderr=subprocess.STDOUT))
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        return float(output)
     except:
         return 0.0
 
@@ -117,21 +134,17 @@ def get_duration(file_path):
 # 3. UI LAYOUT
 # ==========================================
 
-# Header
 st.markdown('<div class="main-header">🎙️ Tommy\'s STT</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', unsafe_allow_html=True)
 
-# 1. INPUT SECTION
-# File Uploader
+# --- INPUT SECTION (SUPPORT SEMUA FORMAT HP) ---
 uploaded_file = st.file_uploader(
     "📂 Pilih File Audio (Support Semua Format)", 
-    # Tambahkan mp4, 3gp, amr, ogg, flac, wma agar file HP terbaca
     type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"]
 )
 
-st.write("") # Spacer
+st.write("") 
 
-# Pilihan Bahasa & Tombol (Rata Tengah)
 c1, c2, c3 = st.columns([1, 4, 1]) 
 
 with c2:
@@ -139,7 +152,7 @@ with c2:
     st.write("") 
     submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
 
-# 2. OUTPUT SECTION
+# --- OUTPUT SECTION ---
 if submit_btn and uploaded_file:
     st.markdown("---")
     
@@ -156,7 +169,7 @@ if submit_btn and uploaded_file:
     try:
         duration_sec = get_duration(input_path)
         if duration_sec == 0:
-            st.error("File audio corrupt atau format tidak didukung.")
+            st.error("Gagal membaca durasi. File mungkin corrupt.")
             st.stop()
             
         chunk_len = 59 
@@ -171,11 +184,13 @@ if submit_btn and uploaded_file:
             start_time = i * chunk_len
             chunk_filename = f"temp_slice_{i}.wav"
             
+            # Gunakan variabel ffmpeg_cmd yang sudah dideteksi di atas
             cmd = [
                 ffmpeg_cmd, "-y", "-i", input_path,
                 "-ss", str(start_time), "-t", str(chunk_len),
                 "-ar", "16000", "-ac", "1", chunk_filename
             ]
+            
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             
             try:
@@ -214,7 +229,7 @@ if submit_btn and uploaded_file:
             os.remove(input_path)
 
 # ==========================================
-# 4. FOOTER (UPDATED)
+# 4. FOOTER
 # ==========================================
 st.markdown("<br><br>", unsafe_allow_html=True) 
 st.markdown("---") 
@@ -230,4 +245,3 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
