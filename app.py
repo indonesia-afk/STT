@@ -6,7 +6,7 @@ import math
 import tempfile
 from shutil import which # Library untuk mendeteksi lokasi ffmpeg di sistem
 
-st.set_page_config(page_title="Tommy's STT Online", page_icon="📲", layout="centered")
+st.set_page_config(page_title="Tommy's STT Online", page_icon="🎙️", layout="centered")
 
 # ==========================================
 # 🛠️ KONFIGURASI FFMPEG (HYBRID: WINDOWS & LINUX)
@@ -39,7 +39,7 @@ else:
 st.title("🎙️ STT Tommy")
 st.markdown("Upload audio, biarkan server yang memprosesnya.")
 
-# Fungsi Helper: Cek Durasi (Menggunakan command yang sudah dideteksi di atas)
+# Fungsi Helper: Cek Durasi
 def get_duration(file_path):
     cmd = [
         ffprobe_cmd, 
@@ -54,8 +54,11 @@ def get_duration(file_path):
     except:
         return 0.0
 
-# Upload File
-uploaded_file = st.file_uploader("Upload Audio (AAC/MP3/WAV)", type=["aac", "mp3", "wav", "m4a"])
+# --- UPDATE DI SINI: MENAMBAHKAN "opus" KE DALAM LIST ---
+uploaded_file = st.file_uploader(
+    "Upload Audio (AAC, MP3, WAV, M4A, OPUS)", 
+    type=["aac", "mp3", "wav", "m4a", "opus"]
+)
 lang_choice = st.selectbox("Bahasa:", ("Indonesia", "Inggris"))
 
 if st.button("Mulai Transkrip") and uploaded_file:
@@ -76,7 +79,7 @@ if st.button("Mulai Transkrip") and uploaded_file:
         # 2. Cek Durasi
         duration_sec = get_duration(input_path)
         if duration_sec == 0:
-            st.error("Gagal membaca durasi file audio.")
+            st.error("Gagal membaca durasi file audio. File mungkin corrupt atau format tidak didukung.")
             st.stop()
             
         chunk_len = 59 
@@ -92,7 +95,7 @@ if st.button("Mulai Transkrip") and uploaded_file:
             start_time = i * chunk_len
             chunk_filename = f"temp_slice_{i}.wav"
             
-            # Gunakan ffmpeg_cmd yang sudah dideteksi (bisa .exe atau command linux)
+            # Perintah FFmpeg akan otomatis mengonversi format apapun (opus/m4a) ke WAV standar
             cmd = [
                 ffmpeg_cmd, "-y", "-i", input_path,
                 "-ss", str(start_time), "-t", str(chunk_len),
@@ -134,7 +137,7 @@ if st.button("Mulai Transkrip") and uploaded_file:
 # ==========================================
 # 🦶 FOOTER SECTION
 # ==========================================
-st.markdown("---") # Garis pembatas
+st.markdown("---") 
 st.markdown(
     """
     <div style="text-align: center; font-size: 14px; color: #666;">
