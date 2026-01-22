@@ -16,80 +16,24 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (MODERN, CLEAN, FIX ALL BUTTONS) ---
+# --- CUSTOM CSS ---
 st.markdown("""
 <style>
-    /* Background & Font */
     .stApp { background-color: #FFFFFF; }
-    .main-header {
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-weight: 800;
-        color: #111;
-        text-align: center;
-        margin-top: 20px;
-        margin-bottom: 5px;
-        font-size: 2.2rem;
-        letter-spacing: -1px;
-    }
-    .sub-header {
-        font-family: 'Helvetica Neue', sans-serif;
-        color: #666;
-        text-align: center;
-        font-size: 1rem;
-        margin-bottom: 30px;
-        font-weight: 400;
-    }
-
-    /* Label Styling */
-    .stFileUploader label, div[data-testid="stSelectbox"] label, .stAudioInput label {
-        width: 100% !important;
-        text-align: center !important;
-        display: block !important;
-        color: #111 !important;
-        font-size: 1rem !important;
-        font-weight: 600 !important;
-        margin-bottom: 8px !important;
-    }
-
-    /* Caption & Text Fix */
-    .stCaption, div[data-testid="stCaptionContainer"], small, p { color: #444444 !important; }
+    .main-header { font-family: 'Helvetica Neue', sans-serif; font-weight: 800; color: #111; text-align: center; margin-top: 20px; font-size: 2.2rem; }
+    .sub-header { font-family: 'Helvetica Neue', sans-serif; color: #666; text-align: center; font-size: 1rem; margin-bottom: 30px; }
+    .stFileUploader label, div[data-testid="stSelectbox"] label, .stAudioInput label { color: #111 !important; text-align: center !important; font-weight: 600 !important; }
+    .stCaption, p { color: #444 !important; }
     
-    /* Tombol Styling (Hitam Putih) */
+    /* Tombol Hitam */
     div.stButton > button, div.stDownloadButton > button {
-        width: 100%;
-        background-color: #000000 !important;
-        color: #FFFFFF !important;
-        border: 1px solid #000000;
-        padding: 14px 20px;
-        font-size: 16px;
-        font-weight: 700;
-        border-radius: 8px;
-        transition: all 0.2s;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        width: 100%; background-color: #000000 !important; color: #FFFFFF !important;
+        border: 1px solid #000000; padding: 14px; font-weight: 700; border-radius: 8px;
     }
-    div.stButton > button p, div.stDownloadButton > button p { color: #FFFFFF !important; }
-    
     div.stButton > button:hover, div.stDownloadButton > button:hover {
-        background-color: #333333 !important;
-        color: #FFFFFF !important; 
-        border-color: #333333;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        background-color: #333 !important; transform: translateY(-2px);
     }
-    
-    /* Mobile Tips Box */
-    .mobile-tips {
-        background-color: #FFF3CD;
-        color: #856404;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        text-align: center;
-        margin-bottom: 20px;
-        border: 1px solid #FFEEBA;
-    }
-
-    /* Footer */
+    .mobile-tips { background-color: #FFF3CD; color: #856404; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px; border: 1px solid #FFEEBA; }
     .footer-link { text-decoration: none; font-weight: 700; color: #e74c3c !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -125,103 +69,95 @@ def get_duration(file_path):
 # ==========================================
 
 st.markdown('<div class="main-header">🎙️ Tommy\'s STT</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Konversi Rapat & Jarak Jauh (Booster Aktif)</div>', unsafe_allow_html=True)
 
-# Tips Khusus HP
 st.markdown("""
 <div class="mobile-tips">
-    📱 <b>Tips:</b> Jangan biarkan layar mati saat proses berjalan.<br>
-    Izinkan akses mikrofon jika diminta browser.
+    🔊 <b>Mode Rapat:</b> Sistem ini sekarang otomatis <b>memperbesar volume 3x lipat</b>.<br>
+    Letakkan HP di tengah meja agar semua suara tertangkap.
 </div>
 """, unsafe_allow_html=True)
 
-# --- TAB SELECTION (UPLOAD vs MIC) ---
 tab1, tab2 = st.tabs(["📂 Upload File", "🎙️ Rekam Suara"])
-
 audio_to_process = None
 source_name = "audio"
 
 with tab1:
-    uploaded_file = st.file_uploader(
-        "Pilih File Audio (Support Semua Format)", 
-        type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"]
-    )
+    uploaded_file = st.file_uploader("Pilih File Audio Rapat", type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"])
     if uploaded_file:
         audio_to_process = uploaded_file
         source_name = uploaded_file.name
 
 with tab2:
-    # Fitur Native Mic Streamlit
     audio_mic = st.audio_input("Klik ikon mic untuk mulai merekam")
     if audio_mic:
         audio_to_process = audio_mic
         source_name = "rekaman_mic.wav"
 
 st.write("") 
-
-# --- TOMBOL & BAHASA ---
 c1, c2, c3 = st.columns([1, 4, 1]) 
 with c2:
-    lang_choice = st.selectbox("Pilih Bahasa Audio", ("Indonesia", "Inggris"))
+    lang_choice = st.selectbox("Pilih Bahasa", ("Indonesia", "Inggris"))
     st.write("") 
-    # Tombol hanya aktif jika ada audio yang dipilih/direkam
     if audio_to_process:
         submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
     else:
-        st.info("👆 Silakan Upload File atau Rekam Suara dulu.")
+        st.info("👆 Silakan Upload atau Rekam dulu.")
         submit_btn = False
 
-# --- PROSES TRANSKRIP ---
 if submit_btn and audio_to_process:
     st.markdown("---")
-    
     status_box = st.empty()
     progress_bar = st.progress(0)
     result_area = st.empty()
     full_transcript = []
     
-    # 1. Simpan File Sementara
-    # Menggunakan suffix .wav default jika dari mic, atau extension asli jika upload
     if source_name == "rekaman_mic.wav":
         file_ext = ".wav"
     else:
         file_ext = os.path.splitext(source_name)[1]
-        if not file_ext: file_ext = ".wav" # Fallback
+        if not file_ext: file_ext = ".wav"
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp_file:
         tmp_file.write(audio_to_process.getvalue())
         input_path = tmp_file.name
 
     try:
-        # 2. Cek Durasi
         duration_sec = get_duration(input_path)
         if duration_sec == 0:
-            st.error("Gagal membaca audio. Pastikan file tidak corrupt.")
+            st.error("Gagal membaca audio.")
             st.stop()
             
         chunk_len = 59 
         total_chunks = math.ceil(duration_sec / chunk_len)
-        
-        status_box.info(f"⏱️ Durasi: {duration_sec:.2f} detik | Memproses {total_chunks} bagian...")
+        status_box.info(f"⏱️ Durasi: {duration_sec:.2f}s | Booster Volume Aktif 🔊")
         
         recognizer = sr.Recognizer()
+        # --- UPDATE PENTING: SENSITIVITAS ---
+        # Menurunkan threshold agar suara pelan/jauh tetap dianggap "suara"
+        # Default biasanya 300-4000. Kita set rendah agar sensitif.
+        recognizer.energy_threshold = 300 
+        recognizer.dynamic_energy_threshold = True # Biarkan dia menyesuaikan diri
+        
         lang_code = "id-ID" if lang_choice == "Indonesia" else "en-US"
 
-        # 3. Loop Processing
         for i in range(total_chunks):
             start_time = i * chunk_len
             chunk_filename = f"temp_slice_{i}.wav"
             
-            # FFmpeg Slicing
+            # --- UPDATE PENTING: FFmpeg VOLUME BOOST ---
+            # -filter:a "volume=3.0" -> Melipatgandakan volume 300%
             cmd = [
                 ffmpeg_cmd, "-y", "-i", input_path,
                 "-ss", str(start_time), "-t", str(chunk_len),
+                "-filter:a", "volume=3.0", 
                 "-ar", "16000", "-ac", "1", chunk_filename
             ]
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             
             try:
                 with sr.AudioFile(chunk_filename) as source:
+                    # Ambil data audio
                     audio_data = recognizer.record(source)
                     text = recognizer.recognize_google(audio_data, language=lang_code)
                     full_transcript.append(text)
@@ -236,39 +172,18 @@ if submit_btn and audio_to_process:
             
             pct = int(((i + 1) / total_chunks) * 100)
             progress_bar.progress(pct)
-            status_box.caption(f"Sedang memproses... ({pct}%)")
+            status_box.caption(f"Memproses bagian {i+1}/{total_chunks}...")
 
         status_box.success("✅ Selesai!")
         final_text = " ".join(full_transcript)
-        
-        st.download_button(
-            label="💾 Download Hasil (.TXT)", 
-            data=final_text, 
-            file_name="transkrip.txt", 
-            mime="text/plain",
-            use_container_width=True 
-        )
+        st.download_button("💾 Download Hasil (.TXT)", final_text, "transkrip.txt", "text/plain", use_container_width=True)
 
     except Exception as e:
-        st.error(f"Terjadi kesalahan: {e}")
+        st.error(f"Error: {e}")
     finally:
         if os.path.exists(input_path):
             os.remove(input_path)
 
-# ==========================================
-# 4. FOOTER
-# ==========================================
-st.markdown("<br><br>", unsafe_allow_html=True) 
-st.markdown("---") 
-st.markdown(
-    """
-    <div style="text-align: center; font-size: 13px; color: #888; font-family: sans-serif;">
-        Powered by &nbsp;
-        <a href="https://espeje.com" target="_blank" class="footer-link">espeje.com</a> 
-        &nbsp;&amp;&nbsp; 
-        <a href="https://link-gr.id" target="_blank" class="footer-link">link-gr.id</a>
-    </div>
-    <div style="margin-bottom: 20px;"></div>
-    """,
-    unsafe_allow_html=True
-)
+# Footer
+st.markdown("<br><br><hr>", unsafe_allow_html=True) 
+st.markdown("""<div style="text-align: center; font-size: 13px; color: #888;">Powered by <a href="https://espeje.com" target="_blank" class="footer-link">espeje.com</a> & <a href="https://link-gr.id" target="_blank" class="footer-link">link-gr.id</a></div>""", unsafe_allow_html=True)
