@@ -10,7 +10,7 @@ from shutil import which
 # 1. SETUP & CONFIG
 # ==========================================
 st.set_page_config(
-    page_title="Tommy's STT", 
+    page_title="STT Tommy", 
     page_icon="🎙️", 
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -129,7 +129,7 @@ def get_duration(file_path):
 # ==========================================
 
 # Header
-st.markdown('<div class="main-header">🎙️ Tommy's STT</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">🎙️ STT Tommy</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', unsafe_allow_html=True)
 
 # --- CONTAINER 1: INPUT ---
