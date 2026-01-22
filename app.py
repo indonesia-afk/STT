@@ -16,22 +16,24 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (FINAL UI: Modern Font & Clean Look) ---
+# --- CUSTOM CSS (FINAL UI: Cleaner Uploader & Strong Title) ---
 st.markdown("""
 <style>
     /* 1. Background Aplikasi: Putih Bersih */
     .stApp { background-color: #FFFFFF !important; }
     
-    /* 2. Header Style */
+    /* 2. Header Style (FONT TEGAS & TEBAL) */
     .main-header {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        font-weight: 800;
+        /* Menggunakan 'Arial Black' untuk kesan tegas dan tebal */
+        font-family: 'Arial Black', 'Gadget', sans-serif; 
+        font-weight: 900;
         color: #111111 !important;
         text-align: center;
         margin-top: 20px;
         margin-bottom: 5px;
-        font-size: 2.4rem;
-        letter-spacing: -1.5px;
+        font-size: 2.5rem; 
+        letter-spacing: -1px;
+        text-transform: uppercase; /* Opsional: Membuat huruf kapital semua agar makin tegas */
     }
     .sub-header {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -53,18 +55,39 @@ st.markdown("""
         margin-bottom: 8px !important;
     }
 
-    /* 4. AREA UPLOAD FILE (DROPZONE - ABU MUDA) */
+    /* 4. AREA UPLOAD FILE (CLEAN LOOK) */
     [data-testid="stFileUploaderDropzone"] {
         background-color: #F0F2F6 !important; 
         border: 1px dashed #444 !important;
         border-radius: 12px;
     }
 
-    /* Teks instruksi dropzone */
-    [data-testid="stFileUploaderDropzone"] div,
-    [data-testid="stFileUploaderDropzone"] span,
+    /* A. Teks "Drag and drop file here" */
+    [data-testid="stFileUploaderDropzone"] div div::before {
+        color: #333333 !important; 
+        font-weight: 600;
+    }
+    
+    /* B. MENGHILANGKAN DAFTAR EXTENSION (AAC, MP3, dll) */
     [data-testid="stFileUploaderDropzone"] small {
-        color: #333333 !important;
+        display: none !important;
+    }
+
+    /* C. MENAMPILKAN CUSTOM TEXT "Limit 200MB per file" SAJA */
+    /* Kita gunakan trik ::after pada container small sebelumnya */
+    [data-testid="stFileUploaderDropzone"] > div > div > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    /* Membuat teks pengganti */
+    [data-testid="stFileUploaderDropzone"] > div > div::after {
+        content: "Limit 200MB per file";
+        color: #555555;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: block;
     }
 
     /* Tombol Kecil "Browse files" */
@@ -152,7 +175,7 @@ def get_duration(file_path):
 # 3. UI LAYOUT
 # ==========================================
 
-# --- JUDUL BARU: TOM'STT ---
+# --- JUDUL BARU: FONT 'ARIAL BLACK' YANG TEGAS ---
 st.markdown("""
 <div class="main-header">
     🎙️ TOM'<span style="color: #e74c3c;">STT</span>
@@ -163,7 +186,7 @@ st.markdown('<div class="sub-header">Speech-to-Text | Konversi Audio ke Teks</di
 
 st.markdown("""
 <div class="mobile-tips">
-    <b>Tips Pengguna HP:</b><br>
+    <b>Tips Pengguna Handphone:</b><br>
     Saat proses upload & transkrip berjalan, <b>jangan biarkan layar mati atau berpindah aplikasi</b> agar koneksi tidak terputus.
 </div>
 """, unsafe_allow_html=True)
@@ -171,13 +194,12 @@ st.markdown("""
 # --- TAB SELECTION ---
 tab1, tab2 = st.tabs(["📂 Upload File", "🎙️ Rekam Suara (Unstable)"])
 audio_to_process = None
-source_name = "audio" # Default placeholder
+source_name = "audio" 
 
 with tab1:
     uploaded_file = st.file_uploader("Pilih File Audio", type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"])
     if uploaded_file:
         audio_to_process = uploaded_file
-        # Simpan nama file asli dari uploader
         source_name = uploaded_file.name
 
 with tab2:
@@ -205,7 +227,6 @@ if submit_btn and audio_to_process:
     result_area = st.empty()
     full_transcript = []
     
-    # Tentukan ekstensi untuk file sementara
     if source_name == "rekaman_mic.wav":
         file_ext = ".wav"
     else:
@@ -266,16 +287,14 @@ if submit_btn and audio_to_process:
         status_box.success("✅ Selesai!")
         final_text = " ".join(full_transcript)
         
-        # --- LOGIKA PENAMAAN FILE OTOMATIS ---
-        # Ambil nama file asli tanpa ekstensi (misal: "Rapat.mp3" -> "Rapat")
+        # --- AUTO FILENAME ---
         base_name = os.path.splitext(source_name)[0]
-        # Buat nama output: "Rapat.txt"
         output_filename = f"{base_name}.txt"
         
         st.download_button(
-            label=f"💾 Download {output_filename}", # Label tombol menyesuaikan
+            label=f"💾 Download {output_filename}", 
             data=final_text, 
-            file_name=output_filename, # Nama file fisik
+            file_name=output_filename, 
             mime="text/plain", 
             use_container_width=True
         )
