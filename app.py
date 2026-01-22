@@ -16,24 +16,88 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS ---
+# --- CUSTOM CSS (DIPERBAIKI: Tombol Putih, Notifikasi Gelap) ---
 st.markdown("""
 <style>
+    /* 1. Background Putih */
     .stApp { background-color: #FFFFFF; }
-    .main-header { font-family: 'Helvetica Neue', sans-serif; font-weight: 800; color: #111; text-align: center; margin-top: 20px; font-size: 2.2rem; }
-    .sub-header { font-family: 'Helvetica Neue', sans-serif; color: #666; text-align: center; font-size: 1rem; margin-bottom: 30px; }
-    .stFileUploader label, div[data-testid="stSelectbox"] label, .stAudioInput label { color: #111 !important; text-align: center !important; font-weight: 600 !important; }
-    .stCaption, p { color: #444 !important; }
     
-    /* Tombol Hitam */
+    /* 2. Header */
+    .main-header {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-weight: 800;
+        color: #111;
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 5px;
+        font-size: 2.2rem;
+        letter-spacing: -1px;
+    }
+    .sub-header {
+        font-family: 'Helvetica Neue', sans-serif;
+        color: #666;
+        text-align: center;
+        font-size: 1rem;
+        margin-bottom: 30px;
+        font-weight: 400;
+    }
+
+    /* 3. Label Input (Hitam) */
+    .stFileUploader label, div[data-testid="stSelectbox"] label, .stAudioInput label {
+        width: 100% !important;
+        text-align: center !important;
+        display: block !important;
+        color: #111 !important;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 8px !important;
+    }
+
+    /* 4. Notifikasi & Teks Biasa (Abu Gelap) */
+    .stCaption, div[data-testid="stCaptionContainer"], small, p {
+        color: #444444 !important; 
+    }
+    
+    /* 5. TOMBOL (Hitam Pekat, Teks WAJIB Putih) */
     div.stButton > button, div.stDownloadButton > button {
-        width: 100%; background-color: #000000 !important; color: #FFFFFF !important;
-        border: 1px solid #000000; padding: 14px; font-weight: 700; border-radius: 8px;
+        width: 100%;
+        background-color: #000000 !important;
+        color: #FFFFFF !important;
+        border: 1px solid #000000;
+        padding: 14px 20px;
+        font-size: 16px;
+        font-weight: 700;
+        border-radius: 8px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+    
+    /* [PENTING] Memaksa teks DI DALAM tombol menjadi PUTIH (Override aturan no. 4) */
+    div.stButton > button p, div.stDownloadButton > button p {
+        color: #FFFFFF !important;
+    }
+    
     div.stButton > button:hover, div.stDownloadButton > button:hover {
-        background-color: #333 !important; transform: translateY(-2px);
+        background-color: #333333 !important;
+        color: #FFFFFF !important; 
+        transform: translateY(-2px);
     }
-    .mobile-tips { background-color: #FFF3CD; color: #856404; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px; border: 1px solid #FFEEBA; }
+    
+    /* 6. Tips Box */
+    .mobile-tips {
+        background-color: #FFF3CD;
+        color: #856404;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 20px;
+        border: 1px solid #FFEEBA;
+    }
+    /* Agar teks di dalam tips box warnanya benar */
+    .mobile-tips p { color: #856404 !important; }
+
+    /* 7. Footer */
     .footer-link { text-decoration: none; font-weight: 700; color: #e74c3c !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -83,7 +147,7 @@ audio_to_process = None
 source_name = "audio"
 
 with tab1:
-    uploaded_file = st.file_uploader("Pilih File Audio Rapat", type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"])
+    uploaded_file = st.file_uploader("Pilih File Audio (Support Semua Format)", type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"])
     if uploaded_file:
         audio_to_process = uploaded_file
         source_name = uploaded_file.name
@@ -97,7 +161,7 @@ with tab2:
 st.write("") 
 c1, c2, c3 = st.columns([1, 4, 1]) 
 with c2:
-    lang_choice = st.selectbox("Pilih Bahasa", ("Indonesia", "Inggris"))
+    lang_choice = st.selectbox("Pilih Bahasa Audio", ("Indonesia", "Inggris"))
     st.write("") 
     if audio_to_process:
         submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
@@ -107,6 +171,7 @@ with c2:
 
 if submit_btn and audio_to_process:
     st.markdown("---")
+    
     status_box = st.empty()
     progress_bar = st.progress(0)
     result_area = st.empty()
@@ -130,14 +195,12 @@ if submit_btn and audio_to_process:
             
         chunk_len = 59 
         total_chunks = math.ceil(duration_sec / chunk_len)
-        status_box.info(f"⏱️ Durasi: {duration_sec:.2f}s | Booster Volume Aktif 🔊")
+        status_box.info(f"⏱️ Durasi: {duration_sec:.2f}s | Booster Volume 300% Aktif 🔊")
         
         recognizer = sr.Recognizer()
-        # --- UPDATE PENTING: SENSITIVITAS ---
-        # Menurunkan threshold agar suara pelan/jauh tetap dianggap "suara"
-        # Default biasanya 300-4000. Kita set rendah agar sensitif.
+        # SETTING SENSITIVITAS TINGGI
         recognizer.energy_threshold = 300 
-        recognizer.dynamic_energy_threshold = True # Biarkan dia menyesuaikan diri
+        recognizer.dynamic_energy_threshold = True 
         
         lang_code = "id-ID" if lang_choice == "Indonesia" else "en-US"
 
@@ -145,8 +208,7 @@ if submit_btn and audio_to_process:
             start_time = i * chunk_len
             chunk_filename = f"temp_slice_{i}.wav"
             
-            # --- UPDATE PENTING: FFmpeg VOLUME BOOST ---
-            # -filter:a "volume=3.0" -> Melipatgandakan volume 300%
+            # FFMPEG VOLUME BOOST 3x
             cmd = [
                 ffmpeg_cmd, "-y", "-i", input_path,
                 "-ss", str(start_time), "-t", str(chunk_len),
@@ -157,7 +219,6 @@ if submit_btn and audio_to_process:
             
             try:
                 with sr.AudioFile(chunk_filename) as source:
-                    # Ambil data audio
                     audio_data = recognizer.record(source)
                     text = recognizer.recognize_google(audio_data, language=lang_code)
                     full_transcript.append(text)
@@ -172,7 +233,7 @@ if submit_btn and audio_to_process:
             
             pct = int(((i + 1) / total_chunks) * 100)
             progress_bar.progress(pct)
-            status_box.caption(f"Memproses bagian {i+1}/{total_chunks}...")
+            status_box.caption(f"Sedang memproses... ({pct}%)")
 
         status_box.success("✅ Selesai!")
         final_text = " ".join(full_transcript)
