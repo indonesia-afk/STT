@@ -36,8 +36,8 @@ else:
 
 # ==========================================
 
-st.title("📲 STT: Akses via HP")
-st.markdown("Upload audio dari HP, biarkan server yang memprosesnya.")
+st.title("🎙️ STT Mobile Tommy")
+st.markdown("Upload audio, biarkan server yang memprosesnya.")
 
 # Fungsi Helper: Cek Durasi (Menggunakan command yang sudah dideteksi di atas)
 def get_duration(file_path):
@@ -129,4 +129,5 @@ if st.button("Mulai Transkrip") and uploaded_file:
         st.error(f"Error: {e}")
     finally:
         if os.path.exists(input_path):
+
             os.remove(input_path)
