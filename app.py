@@ -122,7 +122,7 @@ st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', 
 # --- TIPS KHUSUS HP ---
 st.markdown("""
 <div class="mobile-tips">
-    📱 <b>Tips Pengguna HP:</b><br>
+    <b>Tips Pengguna Handphone:</b><br>
     Saat proses upload & transkrip berjalan, <b>jangan biarkan layar mati</b> atau pindah aplikasi agar koneksi tidak terputus.
 </div>
 """, unsafe_allow_html=True)
@@ -232,3 +232,4 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
