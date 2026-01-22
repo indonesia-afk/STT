@@ -16,9 +16,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS ---
+# --- CUSTOM CSS (MODERN, CLEAN, FIX ALL BUTTONS) ---
 st.markdown("""
 <style>
+    /* Background & Font */
     .stApp { background-color: #FFFFFF; }
     .main-header {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -35,10 +36,12 @@ st.markdown("""
         color: #666;
         text-align: center;
         font-size: 1rem;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
         font-weight: 400;
     }
-    .stFileUploader label, div[data-testid="stSelectbox"] label {
+
+    /* Label Styling */
+    .stFileUploader label, div[data-testid="stSelectbox"] label, .stAudioInput label {
         width: 100% !important;
         text-align: center !important;
         display: block !important;
@@ -47,8 +50,11 @@ st.markdown("""
         font-weight: 600 !important;
         margin-bottom: 8px !important;
     }
+
+    /* Caption & Text Fix */
     .stCaption, div[data-testid="stCaptionContainer"], small, p { color: #444444 !important; }
     
+    /* Tombol Styling (Hitam Putih) */
     div.stButton > button, div.stDownloadButton > button {
         width: 100%;
         background-color: #000000 !important;
@@ -70,9 +76,8 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
-    .footer-link { text-decoration: none; font-weight: 700; color: #e74c3c !important; }
     
-    /* Box Tips HP */
+    /* Mobile Tips Box */
     .mobile-tips {
         background-color: #FFF3CD;
         color: #856404;
@@ -83,11 +88,14 @@ st.markdown("""
         margin-bottom: 20px;
         border: 1px solid #FFEEBA;
     }
+
+    /* Footer */
+    .footer-link { text-decoration: none; font-weight: 700; color: #e74c3c !important; }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. LOGIKA FFMPEG
+# 2. LOGIKA FFMPEG (HYBRID)
 # ==========================================
 project_folder = os.getcwd()
 local_ffmpeg = os.path.join(project_folder, "ffmpeg.exe")
@@ -117,32 +125,54 @@ def get_duration(file_path):
 # ==========================================
 
 st.markdown('<div class="main-header">🎙️ Tommy\'s STT</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Speech-to-Text | Konversi Audio ke Teks</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', unsafe_allow_html=True)
 
-# --- TIPS KHUSUS HP ---
+# Tips Khusus HP
 st.markdown("""
 <div class="mobile-tips">
-    <b>Tips Pengguna Handphone:</b><br>
-    Saat proses upload & transkrip berjalan, <b>jangan biarkan layar mati</b> atau pindah aplikasi agar koneksi tidak terputus.
+    📱 <b>Tips:</b> Jangan biarkan layar mati saat proses berjalan.<br>
+    Izinkan akses mikrofon jika diminta browser.
 </div>
 """, unsafe_allow_html=True)
 
-# --- INPUT SECTION ---
-uploaded_file = st.file_uploader(
-    "📂 Pilih File Audio", 
-    type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"]
-)
+# --- TAB SELECTION (UPLOAD vs MIC) ---
+tab1, tab2 = st.tabs(["📂 Upload File", "🎙️ Rekam Suara"])
+
+audio_to_process = None
+source_name = "audio"
+
+with tab1:
+    uploaded_file = st.file_uploader(
+        "Pilih File Audio (Support Semua Format)", 
+        type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"]
+    )
+    if uploaded_file:
+        audio_to_process = uploaded_file
+        source_name = uploaded_file.name
+
+with tab2:
+    # Fitur Native Mic Streamlit
+    audio_mic = st.audio_input("Klik ikon mic untuk mulai merekam")
+    if audio_mic:
+        audio_to_process = audio_mic
+        source_name = "rekaman_mic.wav"
 
 st.write("") 
 
+# --- TOMBOL & BAHASA ---
 c1, c2, c3 = st.columns([1, 4, 1]) 
 with c2:
-    lang_choice = st.selectbox("Pilih Bahasa", ("Indonesia", "Inggris"))
+    lang_choice = st.selectbox("Pilih Bahasa Audio", ("Indonesia", "Inggris"))
     st.write("") 
-    submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
+    # Tombol hanya aktif jika ada audio yang dipilih/direkam
+    if audio_to_process:
+        submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
+    else:
+        st.info("👆 Silakan Upload File atau Rekam Suara dulu.")
+        submit_btn = False
 
-# --- OUTPUT SECTION ---
-if submit_btn and uploaded_file:
+# --- PROSES TRANSKRIP ---
+if submit_btn and audio_to_process:
     st.markdown("---")
     
     status_box = st.empty()
@@ -150,15 +180,23 @@ if submit_btn and uploaded_file:
     result_area = st.empty()
     full_transcript = []
     
-    file_ext = os.path.splitext(uploaded_file.name)[1]
+    # 1. Simpan File Sementara
+    # Menggunakan suffix .wav default jika dari mic, atau extension asli jika upload
+    if source_name == "rekaman_mic.wav":
+        file_ext = ".wav"
+    else:
+        file_ext = os.path.splitext(source_name)[1]
+        if not file_ext: file_ext = ".wav" # Fallback
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp_file:
-        tmp_file.write(uploaded_file.getvalue())
+        tmp_file.write(audio_to_process.getvalue())
         input_path = tmp_file.name
 
     try:
+        # 2. Cek Durasi
         duration_sec = get_duration(input_path)
         if duration_sec == 0:
-            st.error("Gagal membaca durasi. File mungkin corrupt.")
+            st.error("Gagal membaca audio. Pastikan file tidak corrupt.")
             st.stop()
             
         chunk_len = 59 
@@ -169,10 +207,12 @@ if submit_btn and uploaded_file:
         recognizer = sr.Recognizer()
         lang_code = "id-ID" if lang_choice == "Indonesia" else "en-US"
 
+        # 3. Loop Processing
         for i in range(total_chunks):
             start_time = i * chunk_len
             chunk_filename = f"temp_slice_{i}.wav"
             
+            # FFmpeg Slicing
             cmd = [
                 ffmpeg_cmd, "-y", "-i", input_path,
                 "-ss", str(start_time), "-t", str(chunk_len),
@@ -232,5 +272,3 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
-
