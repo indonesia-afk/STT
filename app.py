@@ -10,36 +10,27 @@ from shutil import which
 # 1. SETUP & CONFIG
 # ==========================================
 st.set_page_config(
-    page_title="STT Tommy", 
+    page_title="STT Pro", 
     page_icon="🎙️", 
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (TAMPILAN) ---
+# --- CUSTOM CSS (TAMPILAN BERSIH) ---
 st.markdown("""
 <style>
-    /* Background Utama */
+    /* Background Bersih */
     .stApp {
-        background-color: #F8F9FA;
-    }
-    
-    /* Card Style */
-    .css-card {
-        border-radius: 15px;
-        padding: 30px;
-        background-color: white;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        margin-bottom: 20px;
-        border: 1px solid #EAEAEA;
+        background-color: #FFFFFF; 
     }
     
     /* Judul Header */
     .main-header {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         font-weight: 800;
-        color: #2C3E50;
+        color: #111;
         text-align: center;
+        margin-top: 20px;
         margin-bottom: 5px;
         font-size: 2.2rem;
         letter-spacing: -1px;
@@ -47,53 +38,46 @@ st.markdown("""
     
     .sub-header {
         font-family: 'Helvetica Neue', sans-serif;
-        color: #7F8C8D;
+        color: #666;
         text-align: center;
         font-size: 1rem;
-        margin-bottom: 35px;
+        margin-bottom: 40px;
         font-weight: 400;
     }
 
-    /* --- FIX: WARNA LABEL UPLOAD & SELECTBOX --- */
-    /* Memaksa label menjadi hitam pekat dan tebal */
-    .stFileUploader label, .stSelectbox label {
-        color: #2C3E50 !important;
-        font-weight: 600 !important;
+    /* Memaksa Warna Label Menjadi Hitam Jelas */
+    label, .stMarkdown p, .stFileUploader div {
+        color: #111 !important;
         font-size: 1rem !important;
-        text-align: center !important; /* Label rata tengah */
-        width: 100%;
-        display: block;
+        font-weight: 600 !important;
     }
-
+    
     /* Tombol Utama */
     div.stButton > button {
         width: 100%;
-        background: linear-gradient(135deg, #FF4B4B 0%, #FF2E2E 100%);
+        background: #000000; /* Hitam Elegan */
         color: white;
         border: none;
         padding: 14px 20px;
         font-size: 16px;
         font-weight: 700;
-        border-radius: 50px; /* Lebih bulat modern */
-        transition: transform 0.2s, box-shadow 0.2s;
-        box-shadow: 0 4px 10px rgba(255, 75, 75, 0.3);
+        border-radius: 8px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
     div.stButton > button:hover {
+        background: #333333;
         transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(255, 75, 75, 0.4);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         color: white;
     }
-
-    /* Footer Styling */
+    
+    /* Footer Link */
     .footer-link {
         text-decoration: none; 
         font-weight: 700; 
-        color: #FF4B4B;
-    }
-    .footer-link:hover {
-        color: #D32F2F;
-        text-decoration: underline;
+        color: #e74c3c;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -129,40 +113,29 @@ def get_duration(file_path):
 # ==========================================
 
 # Header
-st.markdown('<div class="main-header">🎙️ STT Tommy</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">🎙️ STT Pro</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', unsafe_allow_html=True)
 
-# --- CONTAINER 1: INPUT ---
-st.markdown('<div class="css-card">', unsafe_allow_html=True)
-
-# File Uploader (Full Width)
+# 1. INPUT SECTION
+# File Uploader
 uploaded_file = st.file_uploader(
     "📂 Pilih File Audio (AAC, MP3, WAV, M4A, OPUS)", 
     type=["aac", "mp3", "wav", "m4a", "opus"]
 )
 
-# Spacer
-st.write("")
+st.write("") # Spacer
 
-# Layout Rata Tengah untuk Pilihan & Tombol
-# Kita bagi 3 kolom: [Kosong, Isi, Kosong] agar elemen di tengah
+# Pilihan Bahasa & Tombol (Rata Tengah)
 c1, c2, c3 = st.columns([1, 4, 1]) 
 
 with c2:
-    # Selectbox di tengah
     lang_choice = st.selectbox("Pilih Bahasa", ("Indonesia", "Inggris"))
-    
-    st.write("") # Spacer dikit
-    
-    # Tombol di tengah
+    st.write("") 
     submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
 
-st.markdown('</div>', unsafe_allow_html=True) # End Card 1
-
-
-# --- CONTAINER 2: PROCESS & OUTPUT ---
+# 2. OUTPUT SECTION
 if submit_btn and uploaded_file:
-    st.markdown('<div class="css-card">', unsafe_allow_html=True)
+    st.markdown("---") # Garis pemisah yang rapi
     
     status_box = st.empty()
     progress_bar = st.progress(0)
@@ -220,7 +193,6 @@ if submit_btn and uploaded_file:
         status_box.success("✅ Selesai!")
         final_text = " ".join(full_transcript)
         
-        st.markdown("---")
         st.download_button(
             label="💾 Download Hasil (.TXT)", 
             data=final_text, 
@@ -235,11 +207,8 @@ if submit_btn and uploaded_file:
         if os.path.exists(input_path):
             os.remove(input_path)
 
-    st.markdown('</div>', unsafe_allow_html=True) # End Card 2
-
-
 # ==========================================
-# 4. FOOTER (UPDATED)
+# 4. FOOTER
 # ==========================================
 st.markdown("<br><br>", unsafe_allow_html=True) 
 st.markdown("---") 
