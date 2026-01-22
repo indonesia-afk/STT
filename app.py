@@ -57,17 +57,16 @@ st.markdown("""
     }
 
     /* 4. FIX TEXT CAPTION (SEDANG MEMPROSES...) */
-    /* Memaksa caption menjadi abu-abu gelap agar tidak putih-di-atas-putih saat mode gelap */
     .stCaption, div[data-testid="stCaptionContainer"], small, p {
         color: #444444 !important; 
     }
     
-    /* 5. Tombol Utama */
+    /* 5. FIX TOMBOL (WARNA TEKS WAJIB PUTIH) */
     div.stButton > button {
         width: 100%;
-        background: #000000;
-        color: white !important;
-        border: none;
+        background-color: #000000 !important; /* Background Hitam Pekat */
+        color: #FFFFFF !important; /* Teks Putih Terang */
+        border: 1px solid #000000;
         padding: 14px 20px;
         font-size: 16px;
         font-weight: 700;
@@ -76,11 +75,23 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
+    /* Target khusus elemen <p> di dalam tombol agar tidak diubah browser */
+    div.stButton > button p {
+        color: #FFFFFF !important;
+    }
+    
+    /* Efek Hover */
     div.stButton > button:hover {
-        background: #333333;
+        background-color: #333333 !important;
+        color: #FFFFFF !important; /* Tetap Putih saat Hover */
+        border-color: #333333;
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        color: white !important;
+    }
+    
+    div.stButton > button:active {
+        background-color: #000000 !important;
+        color: #FFFFFF !important;
     }
     
     /* 6. Footer Link */
@@ -105,13 +116,11 @@ if os.path.exists(local_ffmpeg) and os.path.exists(local_ffprobe):
     ffmpeg_cmd = local_ffmpeg
     ffprobe_cmd = local_ffprobe
     os.environ["PATH"] += os.pathsep + project_folder
-    # st.sidebar.success("🟢 Mode: Local Windows") 
 else:
     # Mode Cloud (Server Linux Streamlit)
     if which("ffmpeg") and which("ffprobe"):
         ffmpeg_cmd = "ffmpeg"
         ffprobe_cmd = "ffprobe"
-        # st.sidebar.success("☁️ Mode: Cloud Server")
     else:
         st.error("❌ Critical Error: FFmpeg tools not found.")
         st.stop()
