@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (MODERN, CLEAN, DARK MODE FIX) ---
+# --- CUSTOM CSS (MODERN, CLEAN, FIX ALL BUTTONS) ---
 st.markdown("""
 <style>
     /* 1. Paksa Background Putih Bersih */
@@ -56,13 +56,14 @@ st.markdown("""
         margin-bottom: 8px !important;
     }
 
-    /* 4. FIX TEXT CAPTION (SEDANG MEMPROSES...) */
+    /* 4. FIX TEXT CAPTION */
     .stCaption, div[data-testid="stCaptionContainer"], small, p {
         color: #444444 !important; 
     }
     
-    /* 5. FIX TOMBOL (WARNA TEKS WAJIB PUTIH) */
-    div.stButton > button {
+    /* 5. FIX SEMUA TOMBOL (Start & Download) */
+    /* Kita targetkan stButton DAN stDownloadButton sekaligus */
+    div.stButton > button, div.stDownloadButton > button {
         width: 100%;
         background-color: #000000 !important; /* Background Hitam Pekat */
         color: #FFFFFF !important; /* Teks Putih Terang */
@@ -75,21 +76,21 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
-    /* Target khusus elemen <p> di dalam tombol agar tidak diubah browser */
-    div.stButton > button p {
+    /* Target khusus elemen text di dalam tombol agar tidak diubah browser */
+    div.stButton > button p, div.stDownloadButton > button p {
         color: #FFFFFF !important;
     }
     
-    /* Efek Hover */
-    div.stButton > button:hover {
+    /* Efek Hover untuk kedua tombol */
+    div.stButton > button:hover, div.stDownloadButton > button:hover {
         background-color: #333333 !important;
-        color: #FFFFFF !important; /* Tetap Putih saat Hover */
+        color: #FFFFFF !important; 
         border-color: #333333;
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
     
-    div.stButton > button:active {
+    div.stButton > button:active, div.stDownloadButton > button:active {
         background-color: #000000 !important;
         color: #FFFFFF !important;
     }
