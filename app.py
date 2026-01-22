@@ -4,7 +4,7 @@ import os
 import subprocess
 import math
 import tempfile
-from shutil import which # Wajib ada untuk deteksi di Cloud
+from shutil import which
 
 # ==========================================
 # 1. SETUP & CONFIG
@@ -16,15 +16,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (MODERN, CLEAN, FIX ALL BUTTONS) ---
+# --- CUSTOM CSS ---
 st.markdown("""
 <style>
-    /* 1. Paksa Background Putih Bersih */
-    .stApp {
-        background-color: #FFFFFF; 
-    }
-    
-    /* 2. Judul Header */
+    .stApp { background-color: #FFFFFF; }
     .main-header {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         font-weight: 800;
@@ -35,38 +30,29 @@ st.markdown("""
         font-size: 2.2rem;
         letter-spacing: -1px;
     }
-    
     .sub-header {
         font-family: 'Helvetica Neue', sans-serif;
         color: #666;
         text-align: center;
         font-size: 1rem;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
         font-weight: 400;
     }
-
-    /* 3. FIX LABEL AGAR TERLIHAT & CENTER */
     .stFileUploader label, div[data-testid="stSelectbox"] label {
         width: 100% !important;
         text-align: center !important;
         display: block !important;
-        color: #111 !important; /* Hitam Pekat */
+        color: #111 !important;
         font-size: 1rem !important;
         font-weight: 600 !important;
         margin-bottom: 8px !important;
     }
-
-    /* 4. FIX TEXT CAPTION */
-    .stCaption, div[data-testid="stCaptionContainer"], small, p {
-        color: #444444 !important; 
-    }
+    .stCaption, div[data-testid="stCaptionContainer"], small, p { color: #444444 !important; }
     
-    /* 5. FIX SEMUA TOMBOL (Start & Download) */
-    /* Kita targetkan stButton DAN stDownloadButton sekaligus */
     div.stButton > button, div.stDownloadButton > button {
         width: 100%;
-        background-color: #000000 !important; /* Background Hitam Pekat */
-        color: #FFFFFF !important; /* Teks Putih Terang */
+        background-color: #000000 !important;
+        color: #FFFFFF !important;
         border: 1px solid #000000;
         padding: 14px 20px;
         font-size: 16px;
@@ -75,13 +61,8 @@ st.markdown("""
         transition: all 0.2s;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+    div.stButton > button p, div.stDownloadButton > button p { color: #FFFFFF !important; }
     
-    /* Target khusus elemen text di dalam tombol agar tidak diubah browser */
-    div.stButton > button p, div.stDownloadButton > button p {
-        color: #FFFFFF !important;
-    }
-    
-    /* Efek Hover untuk kedua tombol */
     div.stButton > button:hover, div.stDownloadButton > button:hover {
         background-color: #333333 !important;
         color: #FFFFFF !important; 
@@ -89,36 +70,34 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     }
+    .footer-link { text-decoration: none; font-weight: 700; color: #e74c3c !important; }
     
-    div.stButton > button:active, div.stDownloadButton > button:active {
-        background-color: #000000 !important;
-        color: #FFFFFF !important;
-    }
-    
-    /* 6. Footer Link */
-    .footer-link {
-        text-decoration: none; 
-        font-weight: 700; 
-        color: #e74c3c !important;
+    /* Box Tips HP */
+    .mobile-tips {
+        background-color: #FFF3CD;
+        color: #856404;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 20px;
+        border: 1px solid #FFEEBA;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. LOGIKA FFMPEG (HYBRID: CLOUD & LOCAL)
+# 2. LOGIKA FFMPEG
 # ==========================================
 project_folder = os.getcwd()
 local_ffmpeg = os.path.join(project_folder, "ffmpeg.exe")
 local_ffprobe = os.path.join(project_folder, "ffprobe.exe")
 
-# Logika Deteksi: Cek Local Dulu -> Kalau Gak Ada, Cek Sistem (Cloud)
 if os.path.exists(local_ffmpeg) and os.path.exists(local_ffprobe):
-    # Mode Local (Windows Laptop Mas Tommy)
     ffmpeg_cmd = local_ffmpeg
     ffprobe_cmd = local_ffprobe
     os.environ["PATH"] += os.pathsep + project_folder
 else:
-    # Mode Cloud (Server Linux Streamlit)
     if which("ffmpeg") and which("ffprobe"):
         ffmpeg_cmd = "ffmpeg"
         ffprobe_cmd = "ffprobe"
@@ -127,16 +106,9 @@ else:
         st.stop()
 
 def get_duration(file_path):
-    cmd = [
-        ffprobe_cmd, 
-        "-v", "error", 
-        "-show_entries", "format=duration", 
-        "-of", "default=noprint_wrappers=1:nokey=1", 
-        file_path
-    ]
+    cmd = [ffprobe_cmd, "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", file_path]
     try:
-        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-        return float(output)
+        return float(subprocess.check_output(cmd, stderr=subprocess.STDOUT))
     except:
         return 0.0
 
@@ -147,7 +119,15 @@ def get_duration(file_path):
 st.markdown('<div class="main-header">🎙️ Tommy\'s STT</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', unsafe_allow_html=True)
 
-# --- INPUT SECTION (SUPPORT SEMUA FORMAT HP) ---
+# --- TIPS KHUSUS HP ---
+st.markdown("""
+<div class="mobile-tips">
+    📱 <b>Tips Pengguna HP:</b><br>
+    Saat proses upload & transkrip berjalan, <b>jangan biarkan layar mati</b> atau pindah aplikasi agar koneksi tidak terputus.
+</div>
+""", unsafe_allow_html=True)
+
+# --- INPUT SECTION ---
 uploaded_file = st.file_uploader(
     "📂 Pilih File Audio (Support Semua Format)", 
     type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"]
@@ -156,7 +136,6 @@ uploaded_file = st.file_uploader(
 st.write("") 
 
 c1, c2, c3 = st.columns([1, 4, 1]) 
-
 with c2:
     lang_choice = st.selectbox("Pilih Bahasa", ("Indonesia", "Inggris"))
     st.write("") 
@@ -194,13 +173,11 @@ if submit_btn and uploaded_file:
             start_time = i * chunk_len
             chunk_filename = f"temp_slice_{i}.wav"
             
-            # Gunakan variabel ffmpeg_cmd yang sudah dideteksi di atas
             cmd = [
                 ffmpeg_cmd, "-y", "-i", input_path,
                 "-ss", str(start_time), "-t", str(chunk_len),
                 "-ar", "16000", "-ac", "1", chunk_filename
             ]
-            
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             
             try:
