@@ -10,13 +10,13 @@ from shutil import which
 # 1. SETUP & CONFIG
 # ==========================================
 st.set_page_config(
-    page_title="STT Pro", 
+    page_title="Tommy's STT", 
     page_icon="🎙️", 
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (TAMPILAN BERSIH) ---
+# --- CUSTOM CSS (TAMPILAN BERSIH & CENTERED) ---
 st.markdown("""
 <style>
     /* Background Bersih */
@@ -45,11 +45,16 @@ st.markdown("""
         font-weight: 400;
     }
 
-    /* Memaksa Warna Label Menjadi Hitam Jelas */
-    label, .stMarkdown p, .stFileUploader div {
-        color: #111 !important;
+    /* --- UPDATE: LABEL RATA TENGAH --- */
+    /* Target Label File Uploader & Selectbox agar Center */
+    .stFileUploader label, div[data-testid="stSelectbox"] label {
+        width: 100% !important;
+        text-align: center !important;
+        display: block !important;
+        color: #111 !important; /* Warna Hitam Jelas */
         font-size: 1rem !important;
         font-weight: 600 !important;
+        margin-bottom: 8px !important;
     }
     
     /* Tombol Utama */
@@ -113,7 +118,7 @@ def get_duration(file_path):
 # ==========================================
 
 # Header
-st.markdown('<div class="main-header">🎙️ STT Pro</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">🎙️ Tommy\'s STT</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', unsafe_allow_html=True)
 
 # 1. INPUT SECTION
@@ -135,7 +140,7 @@ with c2:
 
 # 2. OUTPUT SECTION
 if submit_btn and uploaded_file:
-    st.markdown("---") # Garis pemisah yang rapi
+    st.markdown("---")
     
     status_box = st.empty()
     progress_bar = st.progress(0)
@@ -208,7 +213,7 @@ if submit_btn and uploaded_file:
             os.remove(input_path)
 
 # ==========================================
-# 4. FOOTER
+# 4. FOOTER (UPDATED)
 # ==========================================
 st.markdown("<br><br>", unsafe_allow_html=True) 
 st.markdown("---") 
@@ -217,7 +222,7 @@ st.markdown(
     <div style="text-align: center; font-size: 13px; color: #888; font-family: sans-serif;">
         Powered by &nbsp;
         <a href="https://espeje.com" target="_blank" class="footer-link">espeje.com</a> 
-        &nbsp;&bull;&nbsp; 
+        &nbsp;&amp;&nbsp; 
         <a href="https://link-gr.id" target="_blank" class="footer-link">link-gr.id</a>
     </div>
     <div style="margin-bottom: 20px;"></div>
