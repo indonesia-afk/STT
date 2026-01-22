@@ -36,7 +36,7 @@ else:
 
 # ==========================================
 
-st.title("🎙️ STT Mobile Tommy")
+st.title("🎙️ STT Tommy")
 st.markdown("Upload audio, biarkan server yang memprosesnya.")
 
 # Fungsi Helper: Cek Durasi (Menggunakan command yang sudah dideteksi di atas)
@@ -129,5 +129,20 @@ if st.button("Mulai Transkrip") and uploaded_file:
         st.error(f"Error: {e}")
     finally:
         if os.path.exists(input_path):
-
             os.remove(input_path)
+
+# ==========================================
+# 🦶 FOOTER SECTION
+# ==========================================
+st.markdown("---") # Garis pembatas
+st.markdown(
+    """
+    <div style="text-align: center; font-size: 14px; color: #666;">
+        Powered by 
+        <a href="https://espeje.com" target="_blank" style="text-decoration: none; font-weight: bold; color: #FF4B4B;">espeje.com</a> 
+        & 
+        <a href="https://link-gr.id" target="_blank" style="text-decoration: none; font-weight: bold; color: #FF4B4B;">link-gr.id</a>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
