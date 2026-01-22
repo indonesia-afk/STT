@@ -16,13 +16,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (DIPERBAIKI: Tombol Putih, Notifikasi Gelap) ---
+# --- CUSTOM CSS (TAMPILAN FINAL: Tombol Putih, Notif Gelap) ---
 st.markdown("""
 <style>
-    /* 1. Background Putih */
+    /* Background Putih */
     .stApp { background-color: #FFFFFF; }
     
-    /* 2. Header */
+    /* Header */
     .main-header {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         font-weight: 800;
@@ -42,7 +42,7 @@ st.markdown("""
         font-weight: 400;
     }
 
-    /* 3. Label Input (Hitam) */
+    /* Label Input (Hitam) */
     .stFileUploader label, div[data-testid="stSelectbox"] label, .stAudioInput label {
         width: 100% !important;
         text-align: center !important;
@@ -53,12 +53,12 @@ st.markdown("""
         margin-bottom: 8px !important;
     }
 
-    /* 4. Notifikasi & Teks Biasa (Abu Gelap) */
+    /* Notifikasi & Teks Biasa (Abu Gelap) */
     .stCaption, div[data-testid="stCaptionContainer"], small, p {
         color: #444444 !important; 
     }
     
-    /* 5. TOMBOL (Hitam Pekat, Teks WAJIB Putih) */
+    /* TOMBOL (Hitam Pekat, Teks WAJIB Putih) */
     div.stButton > button, div.stDownloadButton > button {
         width: 100%;
         background-color: #000000 !important;
@@ -72,7 +72,7 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     
-    /* [PENTING] Memaksa teks DI DALAM tombol menjadi PUTIH (Override aturan no. 4) */
+    /* Memaksa teks DI DALAM tombol menjadi PUTIH */
     div.stButton > button p, div.stDownloadButton > button p {
         color: #FFFFFF !important;
     }
@@ -83,7 +83,7 @@ st.markdown("""
         transform: translateY(-2px);
     }
     
-    /* 6. Tips Box */
+    /* Tips Box (Kuning) */
     .mobile-tips {
         background-color: #FFF3CD;
         color: #856404;
@@ -94,10 +94,10 @@ st.markdown("""
         margin-bottom: 20px;
         border: 1px solid #FFEEBA;
     }
-    /* Agar teks di dalam tips box warnanya benar */
-    .mobile-tips p { color: #856404 !important; }
+    /* Paksa teks di dalam box kuning berwarna coklat (bukan abu) */
+    .mobile-tips p, .mobile-tips b, .mobile-tips small { color: #856404 !important; }
 
-    /* 7. Footer */
+    /* Footer */
     .footer-link { text-decoration: none; font-weight: 700; color: #e74c3c !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -135,10 +135,12 @@ def get_duration(file_path):
 st.markdown('<div class="main-header">🎙️ Tommy\'s STT</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Konversi Rapat & Jarak Jauh (Booster Aktif)</div>', unsafe_allow_html=True)
 
+# --- NOTIFIKASI KEMBALI SEPERTI SEMULA ---
 st.markdown("""
 <div class="mobile-tips">
-    🔊 <b>Mode Rapat:</b> Sistem ini sekarang otomatis <b>memperbesar volume 3x lipat</b>.<br>
-    Letakkan HP di tengah meja agar semua suara tertangkap.
+    📱 <b>Tips Pengguna HP:</b><br>
+    Saat proses upload & transkrip berjalan, <b>jangan biarkan layar mati atau berpindah aplikasi</b> agar koneksi tidak terputus.<br>
+    <small>(Fitur Booster Volume 300% Tetap Aktif)</small>
 </div>
 """, unsafe_allow_html=True)
 
@@ -198,7 +200,7 @@ if submit_btn and audio_to_process:
         status_box.info(f"⏱️ Durasi: {duration_sec:.2f}s | Booster Volume 300% Aktif 🔊")
         
         recognizer = sr.Recognizer()
-        # SETTING SENSITIVITAS TINGGI
+        # Setting Sensitif
         recognizer.energy_threshold = 300 
         recognizer.dynamic_energy_threshold = True 
         
