@@ -10,7 +10,7 @@ from shutil import which
 # 1. SETUP & CONFIG
 # ==========================================
 st.set_page_config(
-    page_title="Tommy's STT", 
+    page_title="TOM'STT", 
     page_icon="🎙️", 
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -22,17 +22,16 @@ st.markdown("""
     /* 1. Background Aplikasi: Putih Bersih */
     .stApp { background-color: #FFFFFF !important; }
     
-    /* 2. Header Style (MODERN FONT UPDATE) */
+    /* 2. Header Style */
     .main-header {
-        /* Menggunakan System UI Font (Standar Modern saat ini) */
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         font-weight: 800;
         color: #111111 !important;
         text-align: center;
         margin-top: 20px;
         margin-bottom: 5px;
-        font-size: 2.4rem; /* Sedikit lebih besar */
-        letter-spacing: -1.5px; /* Rapat & Stylish */
+        font-size: 2.4rem;
+        letter-spacing: -1.5px;
     }
     .sub-header {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -58,7 +57,7 @@ st.markdown("""
     [data-testid="stFileUploaderDropzone"] {
         background-color: #F0F2F6 !important; 
         border: 1px dashed #444 !important;
-        border-radius: 12px; /* Lebih membulat */
+        border-radius: 12px;
     }
 
     /* Teks instruksi dropzone */
@@ -153,10 +152,10 @@ def get_duration(file_path):
 # 3. UI LAYOUT
 # ==========================================
 
-# --- JUDUL DENGAN GAYA MODERN (TWO-TONE) ---
+# --- JUDUL BARU: TOM'STT ---
 st.markdown("""
 <div class="main-header">
-    🎙️ Tommy's <span style="color: #e74c3c;">STT</span>
+    🎙️ TOM'<span style="color: #e74c3c;">STT</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -172,12 +171,13 @@ st.markdown("""
 # --- TAB SELECTION ---
 tab1, tab2 = st.tabs(["📂 Upload File", "🎙️ Rekam Suara (Unstable)"])
 audio_to_process = None
-source_name = "audio"
+source_name = "audio" # Default placeholder
 
 with tab1:
     uploaded_file = st.file_uploader("Pilih File Audio", type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"])
     if uploaded_file:
         audio_to_process = uploaded_file
+        # Simpan nama file asli dari uploader
         source_name = uploaded_file.name
 
 with tab2:
@@ -194,7 +194,6 @@ with c2:
     if audio_to_process:
         submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
     else:
-        # --- PERBAIKAN WORDING ---
         st.info("👆 Silakan Upload atau Rekam terlebih dahulu.")
         submit_btn = False
 
@@ -206,6 +205,7 @@ if submit_btn and audio_to_process:
     result_area = st.empty()
     full_transcript = []
     
+    # Tentukan ekstensi untuk file sementara
     if source_name == "rekaman_mic.wav":
         file_ext = ".wav"
     else:
@@ -265,7 +265,20 @@ if submit_btn and audio_to_process:
 
         status_box.success("✅ Selesai!")
         final_text = " ".join(full_transcript)
-        st.download_button("💾 Download Hasil (.TXT)", final_text, "transkrip.txt", "text/plain", use_container_width=True)
+        
+        # --- LOGIKA PENAMAAN FILE OTOMATIS ---
+        # Ambil nama file asli tanpa ekstensi (misal: "Rapat.mp3" -> "Rapat")
+        base_name = os.path.splitext(source_name)[0]
+        # Buat nama output: "Rapat.txt"
+        output_filename = f"{base_name}.txt"
+        
+        st.download_button(
+            label=f"💾 Download {output_filename}", # Label tombol menyesuaikan
+            data=final_text, 
+            file_name=output_filename, # Nama file fisik
+            mime="text/plain", 
+            use_container_width=True
+        )
 
     except Exception as e:
         st.error(f"Error: {e}")
