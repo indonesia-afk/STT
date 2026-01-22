@@ -16,15 +16,15 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (DARK MODE PROOF) ---
+# --- CUSTOM CSS (FINAL FIX: Uploader Visibility) ---
 st.markdown("""
 <style>
-    /* 1. Paksa Background Putih (Double Protect) */
+    /* 1. Background Aplikasi: Putih Bersih */
     .stApp { background-color: #FFFFFF !important; }
     
-    /* 2. Header Style */
+    /* 2. Header & Sub-Header */
     .main-header {
-        font-family: 'Helvetica Neue', sans-serif;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         font-weight: 800;
         color: #111111 !important;
         text-align: center;
@@ -53,27 +53,35 @@ st.markdown("""
         margin-bottom: 8px !important;
     }
 
-    /* 4. FIX NAMA FILE (CRITICAL FOR MOBILE) */
-    /* Target spesifik nama file yang muncul setelah upload */
-    div[data-testid="stFileUploaderFileName"], 
-    div[data-testid="stFileUploader"] div, 
-    div[data-testid="stFileUploader"] span,
-    div[data-testid="stFileUploader"] small {
-        color: #000000 !important; /* Paksa Hitam */
-        font-weight: 500 !important;
+    /* [CRITICAL FIX] 4. AREA UPLOAD FILE (DROPZONE) */
+    /* Kita beri warna background ABU-ABU MUDA agar tulisan terbaca di mode apapun */
+    [data-testid="stFileUploaderDropzone"] {
+        background-color: #F0F2F6 !important; 
+        border: 1px dashed #444 !important;
+        border-radius: 10px;
     }
-    
-    /* Icon 'X' untuk hapus file juga harus terlihat */
-    button[data-testid="stFileUploaderDeleteBtn"] {
+
+    /* Paksa teks "Drag and drop", "Limit 200MB" jadi Abu Gelap/Hitam */
+    [data-testid="stFileUploaderDropzone"] div,
+    [data-testid="stFileUploaderDropzone"] span,
+    [data-testid="stFileUploaderDropzone"] small {
         color: #333333 !important;
     }
 
-    /* 5. Notifikasi & Teks Biasa */
-    .stCaption, div[data-testid="stCaptionContainer"], small, p {
-        color: #444444 !important; 
+    /* Paksa Tombol Kecil "Browse files" jadi Hitam */
+    [data-testid="stFileUploaderDropzone"] button {
+        background-color: #000000 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+    }
+
+    /* 5. Teks Nama File Setelah Upload */
+    div[data-testid="stFileUploaderFileName"] {
+        color: #000000 !important;
+        font-weight: 600 !important;
     }
     
-    /* 6. TOMBOL (Hitam Solid) */
+    /* 6. TOMBOL UTAMA (Hitam Solid) */
     div.stButton > button, div.stDownloadButton > button {
         width: 100%;
         background-color: #000000 !important;
@@ -86,11 +94,7 @@ st.markdown("""
         transition: all 0.2s;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    
-    /* Teks dalam tombol (Override browser dark mode) */
-    div.stButton > button p, div.stDownloadButton > button p {
-        color: #FFFFFF !important;
-    }
+    div.stButton > button p, div.stDownloadButton > button p { color: #FFFFFF !important; }
     
     div.stButton > button:hover, div.stDownloadButton > button:hover {
         background-color: #333333 !important;
@@ -98,7 +102,10 @@ st.markdown("""
         transform: translateY(-2px);
     }
     
-    /* 7. Tips Box */
+    /* 7. Notifikasi & Tips */
+    .stCaption, div[data-testid="stCaptionContainer"], p { color: #444444 !important; }
+    
+    /* Tips Box (Kuning Pucat) */
     .mobile-tips {
         background-color: #FFF3CD;
         color: #856404;
@@ -109,7 +116,8 @@ st.markdown("""
         margin-bottom: 20px;
         border: 1px solid #FFEEBA;
     }
-    .mobile-tips p, .mobile-tips b { color: #856404 !important; }
+    /* Pastikan teks dalam box kuning terlihat */
+    .mobile-tips b, .mobile-tips small { color: #856404 !important; }
 
     /* Footer */
     .footer-link { text-decoration: none; font-weight: 700; color: #e74c3c !important; }
@@ -149,11 +157,11 @@ def get_duration(file_path):
 st.markdown('<div class="main-header">🎙️ Tommy\'s STT</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Speech-to-Text | Konversi Audio ke Teks</div>', unsafe_allow_html=True)
 
+# --- REVISI TIPS USER (Tanpa Icon HP & Teks Booster) ---
 st.markdown("""
 <div class="mobile-tips">
-    📱 <b>Tips Pengguna HP:</b><br>
-    Saat proses upload & transkrip berjalan, <b>jangan biarkan layar mati atau berpindah aplikasi</b> agar koneksi tidak terputus.<br>
-    <small>(Fitur Booster Volume 300% Tetap Aktif)</small>
+    <b>Tips Pengguna HP:</b><br>
+    Saat proses upload & transkrip berjalan, <b>jangan biarkan layar mati atau berpindah aplikasi</b> agar koneksi tidak terputus.
 </div>
 """, unsafe_allow_html=True)
 
@@ -162,7 +170,6 @@ audio_to_process = None
 source_name = "audio"
 
 with tab1:
-    # Label "Pilih File Audio" akan hitam pekat
     uploaded_file = st.file_uploader("Pilih File Audio", type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"])
     if uploaded_file:
         audio_to_process = uploaded_file
@@ -211,7 +218,7 @@ if submit_btn and audio_to_process:
             
         chunk_len = 59 
         total_chunks = math.ceil(duration_sec / chunk_len)
-        status_box.info(f"⏱️ Durasi: {duration_sec:.2f}s | Booster Volume 300% Aktif 🔊")
+        status_box.info(f"⏱️ Durasi: {duration_sec:.2f}s")
         
         recognizer = sr.Recognizer()
         recognizer.energy_threshold = 300 
@@ -223,6 +230,7 @@ if submit_btn and audio_to_process:
             start_time = i * chunk_len
             chunk_filename = f"temp_slice_{i}.wav"
             
+            # FFMPEG VOLUME BOOST 3x (Tetap aktif di backend)
             cmd = [
                 ffmpeg_cmd, "-y", "-i", input_path,
                 "-ss", str(start_time), "-t", str(chunk_len),
