@@ -124,8 +124,9 @@ st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', 
 # 1. INPUT SECTION
 # File Uploader
 uploaded_file = st.file_uploader(
-    "📂 Pilih File Audio (AAC, MP3, WAV, M4A, OPUS)", 
-    type=["aac", "mp3", "wav", "m4a", "opus"]
+    "📂 Pilih File Audio (Support Semua Format)", 
+    # Tambahkan mp4, 3gp, amr, ogg, flac, wma agar file HP terbaca
+    type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"]
 )
 
 st.write("") # Spacer
@@ -229,3 +230,4 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
