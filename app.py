@@ -117,7 +117,7 @@ def get_duration(file_path):
 # ==========================================
 
 st.markdown('<div class="main-header">🎙️ Tommy\'s STT</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Speech-to-Text | Konversi Audio ke Teks</div>', unsafe_allow_html=True)
 
 # --- TIPS KHUSUS HP ---
 st.markdown("""
@@ -129,7 +129,7 @@ st.markdown("""
 
 # --- INPUT SECTION ---
 uploaded_file = st.file_uploader(
-    "📂 Pilih File Audio (Support Semua Format)", 
+    "📂 Pilih File Audio", 
     type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"]
 )
 
@@ -232,4 +232,5 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
