@@ -10,18 +10,18 @@ from shutil import which
 # 1. SETUP & CONFIG
 # ==========================================
 st.set_page_config(
-    page_title="TOM'STT",
-    page_icon="🎙️",
+    page_title="TOM'STT", 
+    page_icon="🎙️", 
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (FINAL UI: Modern Font & Clean Look & Fix Uploader Text) ---
+# --- CUSTOM CSS (FINAL UI: Centered Info Box & Clean Look) ---
 st.markdown("""
 <style>
     /* 1. Background Aplikasi: Putih Bersih */
     .stApp { background-color: #FFFFFF !important; }
-
+    
     /* 2. Header Style */
     .main-header {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -53,14 +53,14 @@ st.markdown("""
         margin-bottom: 8px !important;
     }
 
-    /* 4. AREA UPLOAD FILE (DROPZONE - ABU MUDA & FIX TEXT COLOR) */
+    /* 4. AREA UPLOAD FILE (DROPZONE - ABU MUDA) */
     [data-testid="stFileUploaderDropzone"] {
-        background-color: #F0F2F6 !important;
+        background-color: #F0F2F6 !important; 
         border: 1px dashed #444 !important;
         border-radius: 12px;
     }
 
-    /* Teks instruksi dropzone DIPAKSA HITAM agar terlihat di semua tema */
+    /* Teks instruksi dropzone DIPAKSA HITAM */
     [data-testid="stFileUploaderDropzone"] div,
     [data-testid="stFileUploaderDropzone"] span,
     [data-testid="stFileUploaderDropzone"] small {
@@ -73,18 +73,16 @@ st.markdown("""
         color: #FFFFFF !important;
         border: none !important;
     }
-
-    /* MENGHILANGKAN Teks Duplikat di Bawah Area Upload */
-    .stFileUploader > div > small {
-        display: none !important;
-    }
+    
+    /* Hilangkan teks extension duplikat */
+    .stFileUploader > div > small { display: none !important; }
 
     /* 5. Teks Nama File Setelah Upload */
     div[data-testid="stFileUploaderFileName"] {
         color: #000000 !important;
         font-weight: 600 !important;
     }
-
+    
     /* 6. TOMBOL UTAMA (Hitam Solid) */
     div.stButton > button, div.stDownloadButton > button {
         width: 100%;
@@ -99,16 +97,16 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     div.stButton > button p, div.stDownloadButton > button p { color: #FFFFFF !important; }
-
+    
     div.stButton > button:hover, div.stDownloadButton > button:hover {
         background-color: #333333 !important;
-        color: #FFFFFF !important;
+        color: #FFFFFF !important; 
         transform: translateY(-2px);
     }
-
+    
     /* 7. Notifikasi & Tips */
     .stCaption, div[data-testid="stCaptionContainer"], p { color: #444444 !important; }
-
+    
     /* Tips Box */
     .mobile-tips {
         background-color: #FFF3CD;
@@ -121,6 +119,18 @@ st.markdown("""
         border: 1px solid #FFEEBA;
     }
     .mobile-tips b, .mobile-tips small { color: #856404 !important; }
+
+    /* [BARU] Custom Info Box (Rata Tengah) */
+    .custom-info-box {
+        background-color: #e6f3ff; /* Warna biru muda khas st.info */
+        color: #0068c9; /* Warna teks biru tua */
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center; /* RATA TENGAH */
+        font-weight: 600;
+        border: 1px solid #cce5ff;
+        margin-bottom: 20px;
+    }
 
     /* Footer Style */
     .footer-link { text-decoration: none; font-weight: 700; color: #e74c3c !important; }
@@ -176,13 +186,12 @@ st.markdown("""
 # --- TAB SELECTION ---
 tab1, tab2 = st.tabs(["📂 Upload File", "🎙️ Rekam Suara (Unstable)"])
 audio_to_process = None
-source_name = "audio" # Default placeholder
+source_name = "audio" 
 
 with tab1:
     uploaded_file = st.file_uploader("Pilih File Audio", type=["aac", "mp3", "wav", "m4a", "opus", "mp4", "3gp", "amr", "ogg", "flac", "wma"])
     if uploaded_file:
         audio_to_process = uploaded_file
-        # Simpan nama file asli dari uploader
         source_name = uploaded_file.name
 
 with tab2:
@@ -191,26 +200,31 @@ with tab2:
         audio_to_process = audio_mic
         source_name = "rekaman_mic.wav"
 
-st.write("")
-c1, c2, c3 = st.columns([1, 4, 1])
+st.write("") 
+c1, c2, c3 = st.columns([1, 4, 1]) 
 with c2:
     lang_choice = st.selectbox("Pilih Bahasa Audio", ("Indonesia", "Inggris"))
-    st.write("")
+    st.write("") 
+    
     if audio_to_process:
         submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
     else:
-        st.info("👆 Silakan Upload atau Rekam terlebih dahulu.")
+        # --- UPDATE: MENGGUNAKAN CUSTOM HTML AGAR RATA TENGAH ---
+        st.markdown("""
+            <div class="custom-info-box">
+                👆 Silakan Upload atau Rekam terlebih dahulu.
+            </div>
+        """, unsafe_allow_html=True)
         submit_btn = False
 
 if submit_btn and audio_to_process:
     st.markdown("---")
-
+    
     status_box = st.empty()
     progress_bar = st.progress(0)
     result_area = st.empty()
     full_transcript = []
-
-    # Tentukan ekstensi untuk file sementara
+    
     if source_name == "rekaman_mic.wav":
         file_ext = ".wav"
     else:
@@ -226,30 +240,30 @@ if submit_btn and audio_to_process:
         if duration_sec == 0:
             st.error("Gagal membaca audio.")
             st.stop()
-
-        chunk_len = 59
+            
+        chunk_len = 59 
         total_chunks = math.ceil(duration_sec / chunk_len)
         status_box.info(f"⏱️ Durasi: {duration_sec:.2f}s")
-
+        
         recognizer = sr.Recognizer()
-        recognizer.energy_threshold = 300
-        recognizer.dynamic_energy_threshold = True
-
+        recognizer.energy_threshold = 300 
+        recognizer.dynamic_energy_threshold = True 
+        
         lang_code = "id-ID" if lang_choice == "Indonesia" else "en-US"
 
         for i in range(total_chunks):
             start_time = i * chunk_len
             chunk_filename = f"temp_slice_{i}.wav"
-
+            
             # FFMPEG VOLUME BOOST 3x
             cmd = [
                 ffmpeg_cmd, "-y", "-i", input_path,
                 "-ss", str(start_time), "-t", str(chunk_len),
-                "-filter:a", "volume=3.0",
+                "-filter:a", "volume=3.0", 
                 "-ar", "16000", "-ac", "1", chunk_filename
             ]
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
+            
             try:
                 with sr.AudioFile(chunk_filename) as source:
                     audio_data = recognizer.record(source)
@@ -257,31 +271,29 @@ if submit_btn and audio_to_process:
                     full_transcript.append(text)
                     result_area.text_area("📝 Live Preview:", " ".join(full_transcript), height=250)
             except sr.UnknownValueError:
-                pass
+                pass 
             except Exception:
-                full_transcript.append("")
+                full_transcript.append("") 
             finally:
                 if os.path.exists(chunk_filename):
                     os.remove(chunk_filename)
-
+            
             pct = int(((i + 1) / total_chunks) * 100)
             progress_bar.progress(pct)
             status_box.caption(f"Sedang memproses... ({pct}%)")
 
         status_box.success("✅ Selesai!")
         final_text = " ".join(full_transcript)
-
-        # --- LOGIKA PENAMAAN FILE OTOMATIS ---
-        # Ambil nama file asli tanpa ekstensi (misal: "Rapat.mp3" -> "Rapat")
+        
+        # --- AUTO FILENAME ---
         base_name = os.path.splitext(source_name)[0]
-        # Buat nama output: "Rapat.txt"
         output_filename = f"{base_name}.txt"
-
+        
         st.download_button(
-            label=f"💾 Download {output_filename}", # Label tombol menyesuaikan
-            data=final_text,
-            file_name=output_filename, # Nama file fisik
-            mime="text/plain",
+            label=f"💾 Download {output_filename}", 
+            data=final_text, 
+            file_name=output_filename, 
+            mime="text/plain", 
             use_container_width=True
         )
 
@@ -291,5 +303,5 @@ if submit_btn and audio_to_process:
         if os.path.exists(input_path):
             os.remove(input_path)
 
-st.markdown("<br><br><hr>", unsafe_allow_html=True)
+st.markdown("<br><br><hr>", unsafe_allow_html=True) 
 st.markdown("""<div style="text-align: center; font-size: 13px; color: #888;">Powered by <a href="https://espeje.com" target="_blank" class="footer-link">espeje.com</a> & <a href="https://link-gr.id" target="_blank" class="footer-link">link-gr.id</a></div>""", unsafe_allow_html=True)
