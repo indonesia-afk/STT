@@ -10,88 +10,86 @@ from shutil import which
 # 1. SETUP & CONFIG
 # ==========================================
 st.set_page_config(
-    page_title="STT Pro", 
+    page_title="Tommy's STT", 
     page_icon="🎙️", 
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (UNTUK TAMPILAN MODERN) ---
+# --- CUSTOM CSS (TAMPILAN) ---
 st.markdown("""
 <style>
-    /* Mengubah background utama menjadi abu-abu sangat muda */
+    /* Background Utama */
     .stApp {
         background-color: #F8F9FA;
     }
     
-    /* Membuat Container 'Card' putih dengan shadow */
+    /* Card Style */
     .css-card {
         border-radius: 15px;
-        padding: 25px;
+        padding: 30px;
         background-color: white;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         margin-bottom: 20px;
-        border: 1px solid #E0E0E0;
+        border: 1px solid #EAEAEA;
     }
     
-    /* Judul Aplikasi yang Modern */
+    /* Judul Header */
     .main-header {
-        font-family: 'Helvetica Neue', sans-serif;
-        font-weight: 700;
-        color: #1E1E1E;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-weight: 800;
+        color: #2C3E50;
         text-align: center;
-        margin-bottom: 10px;
-        font-size: 2rem;
+        margin-bottom: 5px;
+        font-size: 2.2rem;
+        letter-spacing: -1px;
     }
     
     .sub-header {
         font-family: 'Helvetica Neue', sans-serif;
-        color: #757575;
+        color: #7F8C8D;
         text-align: center;
         font-size: 1rem;
-        margin-bottom: 30px;
+        margin-bottom: 35px;
+        font-weight: 400;
     }
 
-    /* Styling Tombol Utama */
+    /* --- FIX: WARNA LABEL UPLOAD & SELECTBOX --- */
+    /* Memaksa label menjadi hitam pekat dan tebal */
+    .stFileUploader label, .stSelectbox label {
+        color: #2C3E50 !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        text-align: center !important; /* Label rata tengah */
+        width: 100%;
+        display: block;
+    }
+
+    /* Tombol Utama */
     div.stButton > button {
         width: 100%;
-        background: linear-gradient(90deg, #FF4B4B 0%, #FF6B6B 100%);
+        background: linear-gradient(135deg, #FF4B4B 0%, #FF2E2E 100%);
         color: white;
         border: none;
-        padding: 12px 20px;
-        font-weight: 600;
-        border-radius: 12px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(255, 75, 75, 0.2);
+        padding: 14px 20px;
+        font-size: 16px;
+        font-weight: 700;
+        border-radius: 50px; /* Lebih bulat modern */
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 10px rgba(255, 75, 75, 0.3);
     }
     
     div.stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(255, 75, 75, 0.3);
-        background: linear-gradient(90deg, #FF3B3B 0%, #FF5B5B 100%);
-        border: none;
+        box-shadow: 0 6px 15px rgba(255, 75, 75, 0.4);
         color: white;
     }
 
-    /* Styling File Uploader agar lebih rapi */
-    .stFileUploader {
-        padding: 10px;
-    }
-
-    /* Text Area Hasil */
-    .stTextArea textarea {
-        border-radius: 10px;
-        border: 1px solid #E0E0E0;
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 14px;
-    }
-    
     /* Footer Styling */
     .footer-link {
         text-decoration: none; 
-        font-weight: 600; 
+        font-weight: 700; 
         color: #FF4B4B;
-        transition: color 0.3s;
     }
     .footer-link:hover {
         color: #D32F2F;
@@ -131,26 +129,33 @@ def get_duration(file_path):
 # ==========================================
 
 # Header
-st.markdown('<div class="main-header">🎙️ STT Pro</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited Duration)</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">🎙️ Tommy's STT</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Konversi Audio ke Teks (Unlimited)</div>', unsafe_allow_html=True)
 
 # --- CONTAINER 1: INPUT ---
 st.markdown('<div class="css-card">', unsafe_allow_html=True)
 
+# File Uploader (Full Width)
 uploaded_file = st.file_uploader(
     "📂 Pilih File Audio (AAC, MP3, WAV, M4A, OPUS)", 
     type=["aac", "mp3", "wav", "m4a", "opus"]
 )
 
-col1, col2 = st.columns(2)
-with col1:
-    lang_choice = st.selectbox("Bahasa Audio", ("Indonesia", "Inggris"))
-with col2:
-    # Spacer agar sejajar jika perlu, atau fitur lain
-    st.write("") 
-    st.write("") # Spacer visual
+# Spacer
+st.write("")
 
-submit_btn = st.button("🚀 Mulai Proses Transkrip")
+# Layout Rata Tengah untuk Pilihan & Tombol
+# Kita bagi 3 kolom: [Kosong, Isi, Kosong] agar elemen di tengah
+c1, c2, c3 = st.columns([1, 4, 1]) 
+
+with c2:
+    # Selectbox di tengah
+    lang_choice = st.selectbox("Pilih Bahasa", ("Indonesia", "Inggris"))
+    
+    st.write("") # Spacer dikit
+    
+    # Tombol di tengah
+    submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
 
 st.markdown('</div>', unsafe_allow_html=True) # End Card 1
 
@@ -199,13 +204,7 @@ if submit_btn and uploaded_file:
                     audio_data = recognizer.record(source)
                     text = recognizer.recognize_google(audio_data, language=lang_code)
                     full_transcript.append(text)
-                    
-                    # Update Preview dalam card
-                    result_area.text_area(
-                        "📝 Live Preview:", 
-                        " ".join(full_transcript), 
-                        height=250
-                    )
+                    result_area.text_area("📝 Live Preview:", " ".join(full_transcript), height=250)
             except sr.UnknownValueError:
                 pass 
             except Exception:
@@ -221,7 +220,6 @@ if submit_btn and uploaded_file:
         status_box.success("✅ Selesai!")
         final_text = " ".join(full_transcript)
         
-        # Tombol Download dengan gaya Streamlit standar (karena download button sulit di-style CSS custom)
         st.markdown("---")
         st.download_button(
             label="💾 Download Hasil (.TXT)", 
@@ -241,9 +239,9 @@ if submit_btn and uploaded_file:
 
 
 # ==========================================
-# 4. FOOTER
+# 4. FOOTER (UPDATED)
 # ==========================================
-st.markdown("<br><br>", unsafe_allow_html=True) # Spacer
+st.markdown("<br><br>", unsafe_allow_html=True) 
 st.markdown("---") 
 st.markdown(
     """
@@ -253,9 +251,7 @@ st.markdown(
         &nbsp;&bull;&nbsp; 
         <a href="https://link-gr.id" target="_blank" class="footer-link">link-gr.id</a>
     </div>
-    <div style="text-align: center; font-size: 11px; color: #BBB; margin-top: 5px;">
-        Versi 2.0 &copy; 2026
-    </div>
+    <div style="margin-bottom: 20px;"></div>
     """,
     unsafe_allow_html=True
 )
