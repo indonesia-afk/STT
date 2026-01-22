@@ -16,16 +16,16 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (FINAL FIX: Uploader Visibility) ---
+# --- CUSTOM CSS (FINAL UI: Two-Tone Title & Visibility Fix) ---
 st.markdown("""
 <style>
     /* 1. Background Aplikasi: Putih Bersih */
     .stApp { background-color: #FFFFFF !important; }
     
-    /* 2. Header & Sub-Header */
+    /* 2. Header Style */
     .main-header {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-weight: 800;
+        font-weight: 800; /* Tebal Modern */
         color: #111111 !important;
         text-align: center;
         margin-top: 20px;
@@ -53,15 +53,15 @@ st.markdown("""
         margin-bottom: 8px !important;
     }
 
-    /* [CRITICAL FIX] 4. AREA UPLOAD FILE (DROPZONE) */
-    /* Kita beri warna background ABU-ABU MUDA agar tulisan terbaca di mode apapun */
+    /* 4. AREA UPLOAD FILE (DROPZONE - ABU MUDA) */
+    /* Background abu-abu muda agar tulisan default browser terbaca */
     [data-testid="stFileUploaderDropzone"] {
         background-color: #F0F2F6 !important; 
         border: 1px dashed #444 !important;
         border-radius: 10px;
     }
 
-    /* Paksa teks "Drag and drop", "Limit 200MB" jadi Abu Gelap/Hitam */
+    /* Paksa teks instruksi dropzone jadi Abu Gelap/Hitam */
     [data-testid="stFileUploaderDropzone"] div,
     [data-testid="stFileUploaderDropzone"] span,
     [data-testid="stFileUploaderDropzone"] small {
@@ -105,7 +105,7 @@ st.markdown("""
     /* 7. Notifikasi & Tips */
     .stCaption, div[data-testid="stCaptionContainer"], p { color: #444444 !important; }
     
-    /* Tips Box (Kuning Pucat) */
+    /* Tips Box */
     .mobile-tips {
         background-color: #FFF3CD;
         color: #856404;
@@ -116,10 +116,9 @@ st.markdown("""
         margin-bottom: 20px;
         border: 1px solid #FFEEBA;
     }
-    /* Pastikan teks dalam box kuning terlihat */
     .mobile-tips b, .mobile-tips small { color: #856404 !important; }
 
-    /* Footer */
+    /* Footer Style (Warna Acuan Title) */
     .footer-link { text-decoration: none; font-weight: 700; color: #e74c3c !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -154,10 +153,16 @@ def get_duration(file_path):
 # 3. UI LAYOUT
 # ==========================================
 
-st.markdown('<div class="main-header">🎙️ Tommy\'s STT</div>', unsafe_allow_html=True)
+# --- JUDUL DENGAN GAYA MODERN (TWO-TONE) ---
+# Menggunakan Span color #e74c3c agar senada dengan footer
+st.markdown("""
+<div class="main-header">
+    🎙️ Tommy's <span style="color: #e74c3c;">STT</span>
+</div>
+""", unsafe_allow_html=True)
+
 st.markdown('<div class="sub-header">Speech-to-Text | Konversi Audio ke Teks</div>', unsafe_allow_html=True)
 
-# --- REVISI TIPS USER (Tanpa Icon HP & Teks Booster) ---
 st.markdown("""
 <div class="mobile-tips">
     <b>Tips Pengguna HP:</b><br>
@@ -165,7 +170,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-tab1, tab2 = st.tabs(["📂 Upload File", "🎙️ Rekam Suara"])
+# --- TAB SELECTION ---
+tab1, tab2 = st.tabs(["📂 Upload File", "🎙️ Rekam Suara (Unstable)"])
 audio_to_process = None
 source_name = "audio"
 
@@ -189,7 +195,8 @@ with c2:
     if audio_to_process:
         submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
     else:
-        st.info("👆 Silakan Upload atau Rekam dulu.")
+        # --- PERBAIKAN WORDING ---
+        st.info("👆 Silakan Upload atau Rekam dahulu.")
         submit_btn = False
 
 if submit_btn and audio_to_process:
@@ -230,7 +237,7 @@ if submit_btn and audio_to_process:
             start_time = i * chunk_len
             chunk_filename = f"temp_slice_{i}.wav"
             
-            # FFMPEG VOLUME BOOST 3x (Tetap aktif di backend)
+            # FFMPEG VOLUME BOOST 3x
             cmd = [
                 ffmpeg_cmd, "-y", "-i", input_path,
                 "-ss", str(start_time), "-t", str(chunk_len),
