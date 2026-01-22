@@ -16,30 +16,31 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS (FINAL UI: Two-Tone Title & Visibility Fix) ---
+# --- CUSTOM CSS (FINAL UI: Modern Font & Clean Look) ---
 st.markdown("""
 <style>
     /* 1. Background Aplikasi: Putih Bersih */
     .stApp { background-color: #FFFFFF !important; }
     
-    /* 2. Header Style */
+    /* 2. Header Style (MODERN FONT UPDATE) */
     .main-header {
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        font-weight: 800; /* Tebal Modern */
+        /* Menggunakan System UI Font (Standar Modern saat ini) */
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-weight: 800;
         color: #111111 !important;
         text-align: center;
         margin-top: 20px;
         margin-bottom: 5px;
-        font-size: 2.2rem;
-        letter-spacing: -1px;
+        font-size: 2.4rem; /* Sedikit lebih besar */
+        letter-spacing: -1.5px; /* Rapat & Stylish */
     }
     .sub-header {
-        font-family: 'Helvetica Neue', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         color: #666666 !important;
         text-align: center;
         font-size: 1rem;
         margin-bottom: 30px;
-        font-weight: 400;
+        font-weight: 500;
     }
 
     /* 3. Label Input (Hitam Pekat) */
@@ -54,21 +55,20 @@ st.markdown("""
     }
 
     /* 4. AREA UPLOAD FILE (DROPZONE - ABU MUDA) */
-    /* Background abu-abu muda agar tulisan default browser terbaca */
     [data-testid="stFileUploaderDropzone"] {
         background-color: #F0F2F6 !important; 
         border: 1px dashed #444 !important;
-        border-radius: 10px;
+        border-radius: 12px; /* Lebih membulat */
     }
 
-    /* Paksa teks instruksi dropzone jadi Abu Gelap/Hitam */
+    /* Teks instruksi dropzone */
     [data-testid="stFileUploaderDropzone"] div,
     [data-testid="stFileUploaderDropzone"] span,
     [data-testid="stFileUploaderDropzone"] small {
         color: #333333 !important;
     }
 
-    /* Paksa Tombol Kecil "Browse files" jadi Hitam */
+    /* Tombol Kecil "Browse files" */
     [data-testid="stFileUploaderDropzone"] button {
         background-color: #000000 !important;
         color: #FFFFFF !important;
@@ -90,7 +90,7 @@ st.markdown("""
         padding: 14px 20px;
         font-size: 16px;
         font-weight: 700;
-        border-radius: 8px;
+        border-radius: 10px;
         transition: all 0.2s;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
@@ -109,16 +109,16 @@ st.markdown("""
     .mobile-tips {
         background-color: #FFF3CD;
         color: #856404;
-        padding: 10px;
-        border-radius: 8px;
+        padding: 12px;
+        border-radius: 10px;
         font-size: 0.9rem;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         border: 1px solid #FFEEBA;
     }
     .mobile-tips b, .mobile-tips small { color: #856404 !important; }
 
-    /* Footer Style (Warna Acuan Title) */
+    /* Footer Style */
     .footer-link { text-decoration: none; font-weight: 700; color: #e74c3c !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -154,7 +154,6 @@ def get_duration(file_path):
 # ==========================================
 
 # --- JUDUL DENGAN GAYA MODERN (TWO-TONE) ---
-# Menggunakan Span color #e74c3c agar senada dengan footer
 st.markdown("""
 <div class="main-header">
     🎙️ Tommy's <span style="color: #e74c3c;">STT</span>
@@ -196,7 +195,7 @@ with c2:
         submit_btn = st.button("🚀 Mulai Transkrip", use_container_width=True)
     else:
         # --- PERBAIKAN WORDING ---
-        st.info("👆 Silakan Upload atau Rekam dahulu.")
+        st.info("👆 Silakan Upload atau Rekam terlebih dahulu.")
         submit_btn = False
 
 if submit_btn and audio_to_process:
